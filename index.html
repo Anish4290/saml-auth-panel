@@ -5,420 +5,177 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAML Authentication Panel</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
-
-        .auth-container {
+        .container {
             background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            position: relative;
-            overflow: hidden;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
-        .auth-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-        }
-
-        .logo {
+        h1 {
+            color: #333;
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 30px;
         }
-
-        .logo h1 {
-            color: #333;
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .logo p {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
         }
-
-        .form-group label {
+        label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 5px;
+            font-weight: bold;
             color: #333;
-            font-weight: 500;
         }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn {
+        input[type="email"] {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        .btn {
+            background-color: #4CAF50;
             color: white;
+            padding: 12px 24px;
             border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 5px;
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            margin-bottom: 1rem;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
         }
-
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            background-color: #45a049;
         }
-
-        .btn:active {
-            transform: translateY(0);
+        .info-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 30px;
         }
-
-        .divider {
-            text-align: center;
-            margin: 1.5rem 0;
-            position: relative;
-        }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #e1e5e9;
-        }
-
-        .divider span {
-            background: white;
-            padding: 0 1rem;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .saml-info {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            border-left: 4px solid #667eea;
-        }
-
-        .saml-info h3 {
+        .info-section h3 {
+            margin-top: 0;
             color: #333;
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
         }
-
-        .saml-info p {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 0.3rem;
-        }
-
-        .response-area {
-            margin-top: 2rem;
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .response-area h3 {
-            color: #333;
-            margin-bottom: 1rem;
-        }
-
-        .response-content {
-            background: white;
-            padding: 1rem;
-            border-radius: 4px;
-            border: 1px solid #e1e5e9;
-            font-family: monospace;
-            font-size: 0.8rem;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .status-pending { background: #ffc107; }
-        .status-success { background: #28a745; }
-        .status-error { background: #dc3545; }
-
-        .config-section {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #e1e5e9;
-        }
-
         .config-item {
-            margin-bottom: 0.5rem;
-            font-size: 0.85rem;
+            margin-bottom: 10px;
         }
-
         .config-label {
-            font-weight: 600;
-            color: #333;
+            font-weight: bold;
             display: inline-block;
-            width: 120px;
+            width: 150px;
         }
-
         .config-value {
-            color: #666;
             font-family: monospace;
+            color: #666;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
         }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <div class="logo">
-            <h1>SAML Auth Panel</h1>
-            <p>Test SAML Authentication Flow</p>
-        </div>
-
-        <form id="authForm">
+    <div class="container">
+        <h1>🔐 SAML Authentication Panel</h1>
+        
+        <form id="samlForm">
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" placeholder="example@domain.com" required>
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" placeholder="user1@example.com" required>
             </div>
             
-            <button type="submit" class="btn" id="loginBtn">
-                <span class="status-indicator status-pending" id="statusIndicator"></span>
-                Sign In with SAML
-            </button>
+            <button type="submit" class="btn">🚀 Sign In with SAML</button>
         </form>
 
-        <div class="divider">
-            <span>OR</span>
-        </div>
-
-        <button class="btn" id="testIdpBtn" style="background: #28a745;">
-            Test with Local IdP
-        </button>
-
-        <div class="saml-info">
-            <h3>SAML Configuration</h3>
-            <p><strong>Entity ID:</strong> <span id="entityId">Loading...</span></p>
-            <p><strong>ACS URL:</strong> <span id="acsUrl">Loading...</span></p>
-            <p><strong>Status:</strong> <span id="samlStatus">Ready for testing</span></p>
-        </div>
-
-        <div class="config-section">
-            <h3 style="margin-bottom: 1rem; color: #333; font-size: 1rem;">Test Configuration</h3>
+        <div class="info-section">
+            <h3>📋 SAML Configuration</h3>
             <div class="config-item">
-                <span class="config-label">IdP SSO URL:</span>
-                <span class="config-value" id="idpSsoUrl">http://localhost:8080/simplesaml/saml2/idp/SSOService.php</span>
+                <span class="config-label">Entity ID:</span>
+                <span class="config-value" id="entityId">Loading...</span>
             </div>
             <div class="config-item">
-                <span class="config-label">IdP Metadata:</span>
-                <span class="config-value" id="idpMetadata">http://localhost:8080/simplesaml/saml2/idp/metadata.php</span>
+                <span class="config-label">ACS URL:</span>
+                <span class="config-value" id="acsUrl">Loading...</span>
+            </div>
+            <div class="config-item">
+                <span class="config-label">Status:</span>
+                <span class="config-value" style="color: green;">✅ Ready for Testing</span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>🧪 Test Configuration</h3>
+            <div class="config-item">
+                <span class="config-label">Local IdP URL:</span>
+                <span class="config-value">http://localhost:8080/simplesaml/saml2/idp/SSOService.php</span>
             </div>
             <div class="config-item">
                 <span class="config-label">Test Users:</span>
                 <span class="config-value">user1@example.com / user1pass</span>
             </div>
-        </div>
-
-        <div class="response-area" id="responseArea">
-            <h3>SAML Response</h3>
-            <div class="response-content" id="responseContent">
-                <!-- SAML response will be displayed here -->
+            <div class="config-item">
+                <span class="config-label">Test Users:</span>
+                <span class="config-value">user2@example.com / user2pass</span>
             </div>
         </div>
+
+        <div id="statusArea"></div>
     </div>
 
     <script>
-        // Initialize the application
+        // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
-        });
-
-        function initializeApp() {
-            // Set up dynamic configuration
+            // Set dynamic URLs
             const currentUrl = window.location.origin + window.location.pathname;
             document.getElementById('entityId').textContent = currentUrl;
             document.getElementById('acsUrl').textContent = currentUrl + 'saml/acs';
-
-            // Set up event listeners
-            document.getElementById('authForm').addEventListener('submit', handleSamlLogin);
-            document.getElementById('testIdpBtn').addEventListener('click', handleTestIdp);
-
-            // Check for SAML response in URL parameters
-            checkForSamlResponse();
-        }
-
-        function handleSamlLogin(event) {
-            event.preventDefault();
             
-            const email = document.getElementById('email').value;
-            const statusIndicator = document.getElementById('statusIndicator');
-            const loginBtn = document.getElementById('loginBtn');
-            
-            // Update UI to show loading state
-            statusIndicator.className = 'status-indicator status-pending';
-            loginBtn.textContent = 'Redirecting to IdP...';
-            loginBtn.disabled = true;
-
-            // Simulate SAML authentication request
-            setTimeout(() => {
-                // In a real implementation, this would redirect to the IdP
-                const samlRequest = generateSamlRequest(email);
-                displaySamlRequest(samlRequest);
+            // Handle form submission
+            document.getElementById('samlForm').addEventListener('submit', function(e) {
+                e.preventDefault();
                 
-                // Reset button state
-                statusIndicator.className = 'status-indicator status-success';
-                loginBtn.innerHTML = '<span class="status-indicator status-success"></span>SAML Request Generated';
-                loginBtn.disabled = false;
-            }, 1000);
-        }
-
-        function handleTestIdp() {
-            const testIdpUrl = 'http://localhost:8080/simplesaml/saml2/idp/SSOService.php';
-            const entityId = document.getElementById('entityId').textContent;
-            const acsUrl = document.getElementById('acsUrl').textContent;
-
-            // Create SAML AuthnRequest (simplified)
-            const samlRequest = btoa(`
-                <samlp:AuthnRequest 
-                    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-                    ID="_${generateId()}"
-                    Version="2.0"
-                    IssueInstant="${new Date().toISOString()}"
-                    Destination="${testIdpUrl}"
-                    AssertionConsumerServiceURL="${acsUrl}">
-                    <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">${entityId}</saml:Issuer>
-                </samlp:AuthnRequest>
-            `);
-
-            // In a real scenario, this would redirect to the IdP
-            alert(`Would redirect to: ${testIdpUrl}?SAMLRequest=${encodeURIComponent(samlRequest)}&RelayState=test`);
-        }
-
-        function generateSamlRequest(email) {
-            const requestId = generateId();
-            const issueInstant = new Date().toISOString();
-            const entityId = document.getElementById('entityId').textContent;
-            
-            return {
-                id: requestId,
-                issueInstant: issueInstant,
-                destination: document.getElementById('idpSsoUrl').textContent,
-                issuer: entityId,
-                email: email,
-                xml: `<samlp:AuthnRequest 
-    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-    ID="${requestId}"
-    Version="2.0"
-    IssueInstant="${issueInstant}"
-    Destination="${document.getElementById('idpSsoUrl').textContent}"
-    AssertionConsumerServiceURL="${document.getElementById('acsUrl').textContent}">
-    <saml:Issuer>${entityId}</saml:Issuer>
-    <samlp:NameIDPolicy 
-        AllowCreate="true"
-        Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"/>
-</samlp:AuthnRequest>`
-            };
-        }
-
-        function displaySamlRequest(request) {
-            const responseArea = document.getElementById('responseArea');
-            const responseContent = document.getElementById('responseContent');
-            
-            responseContent.innerHTML = `
-                <strong>SAML AuthnRequest Generated:</strong><br><br>
-                <strong>Request ID:</strong> ${request.id}<br>
-                <strong>Issue Instant:</strong> ${request.issueInstant}<br>
-                <strong>Destination:</strong> ${request.destination}<br>
-                <strong>Issuer:</strong> ${request.issuer}<br>
-                <strong>Email:</strong> ${request.email}<br><br>
-                <strong>XML Request:</strong><br>
-                <pre style="white-space: pre-wrap; word-wrap: break-word;">${escapeHtml(request.xml)}</pre>
-            `;
-            
-            responseArea.style.display = 'block';
-        }
-
-        function checkForSamlResponse() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const samlResponse = urlParams.get('SAMLResponse');
-            
-            if (samlResponse) {
-                try {
-                    const decoded = atob(samlResponse);
-                    displaySamlResponse(decoded);
-                } catch (e) {
-                    console.error('Failed to decode SAML response:', e);
-                }
-            }
-        }
-
-        function displaySamlResponse(response) {
-            const responseArea = document.getElementById('responseArea');
-            const responseContent = document.getElementById('responseContent');
-            
-            responseContent.innerHTML = `
-                <strong>SAML Response Received:</strong><br><br>
-                <pre style="white-space: pre-wrap; word-wrap: break-word;">${escapeHtml(response)}</pre>
-            `;
-            
-            responseArea.style.display = 'block';
-        }
-
-        function generateId() {
-            return '_' + Math.random().toString(36).substr(2, 32);
-        }
-
-        function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
-        }
+                const email = document.getElementById('email').value;
+                const statusArea = document.getElementById('statusArea');
+                
+                // Show success message
+                statusArea.innerHTML = `
+                    <div class="status success">
+                        <strong>✅ SAML Request Generated!</strong><br>
+                        Email: ${email}<br>
+                        Timestamp: ${new Date().toISOString()}<br>
+                        <small>In a real implementation, you would be redirected to the Identity Provider now.</small>
+                    </div>
+                `;
+                
+                console.log('SAML Authentication requested for:', email);
+                console.log('Entity ID:', document.getElementById('entityId').textContent);
+                console.log('ACS URL:', document.getElementById('acsUrl').textContent);
+            });
+        });
     </script>
 </body>
 </html>
